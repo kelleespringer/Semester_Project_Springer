@@ -9,6 +9,10 @@ import requests
 import json
 import pandas as pd
 
+import requests
+import json
+import pandas as pd
+
 headers = {'Content-type': 'application/json'}
 data = json.dumps({"seriesid": ['CEU0000000001','LNS14000000', 'LNS11000000', 'LNS13000000'],"startyear":"2023", "endyear":"2024"})
 p = requests.post('https://api.bls.gov/publicAPI/v2/timeseries/data/', data=data, headers=headers)
@@ -35,11 +39,10 @@ def process_bls_data(json_data):
     df = pd.DataFrame(data_list)
     return df
 
+
 df = process_bls_data(json_data)
 
 df
-
-
 
 
 
