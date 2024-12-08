@@ -1,13 +1,8 @@
 import streamlit as st
 
-st.title("🎈 My new app")
+st.title("US Bureau of Labor Statistics Dashboard")
 st.write(
-    "Let's start building! For help and inspiration, head over to [docs.streamlit.io](https://docs.streamlit.io/)."
-)
-
-import requests
-import json
-import pandas as pd
+    "Lets look at Total Nonfarm Employment, Unemployment Rate, Civilian Unemployment, and Civilian Labor Force. Let's start building! For help and inspiration, head over to [docs.streamlit.io](https://docs.streamlit.io/).")
 
 import requests
 import json
@@ -17,8 +12,6 @@ headers = {'Content-type': 'application/json'}
 data = json.dumps({"seriesid": ['CEU0000000001','LNS14000000', 'LNS11000000', 'LNS13000000'],"startyear":"2023", "endyear":"2024"})
 p = requests.post('https://api.bls.gov/publicAPI/v2/timeseries/data/', data=data, headers=headers)
 json_data = json.loads(p.text)
-
-print(json_data)
 
 def process_bls_data(json_data):
     data_list = []
@@ -39,12 +32,5 @@ def process_bls_data(json_data):
     df = pd.DataFrame(data_list)
     return df
 
-
 df = process_bls_data(json_data)
-
 df
-
-
-
-
-
