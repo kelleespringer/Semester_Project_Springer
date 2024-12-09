@@ -1,36 +1,32 @@
-import time # for simulating real-time data, time loop                    
-import pandas as pd # read csv, df manipulation                                
-import streamlit as st # data web application development
+import time                
+import pandas as pd                              
+import streamlit as st
 import requests
 import json
+import os
 
-# Set up Streamlit page config
 st.set_page_config(
     page_title="US Bureau of Labor Statistics Dashboard",
     page_icon=":tophat:",
     layout="wide",
     initial_sidebar_state='expanded'
 )
-
 st.title("US Bureau of Labor Statistics Dashboard")
 st.write("Let's look at Total Nonfarm Employment, Unemployment Rate, Civilian Unemployment, and Civilian Employment.")
-
-
 st.sidebar.header("User Input Features")
 selected_year = st.sidebar.selectbox("Select a Year", ("2023", "2024"))
-
-
 headers = {'Content-type': 'application/json'}
 data = json.dumps({
     "seriesid": ['CES0000000001', 'LNS14000000', 'LNS13000000', 'LNS12000000'],
     "startyear": selected_year,
     "endyear": selected_year
 })
-
-
 p = requests.post('https://api.bls.gov/publicAPI/v1/timeseries/data/', data=data, headers=headers)
 json_data = json.loads(p.text)
 
+data_directory = 'data/'
+if not os.path.exists(data_directory):
+    os.makedirs(data_directory)
 
 def process_bls_data(json_data):
     data_list = []
@@ -50,7 +46,7 @@ def process_bls_data(json_data):
             })
 
     df = pd.DataFrame(data_list)
-    df.to_csv('bls_data.csv', index=False)
+    df.to_csv(os.path.join(data_directory, 'bls_data.csv'), index=False)
     return df
 
 

@@ -1,32 +1,33 @@
-name: Monthly Data Update
+name: Monthly Data Collection
 
 on:
   schedule:
+    # This cron expression runs the job at 00:00 UTC on the 1st of every month
     - cron: '0 0 1 * *'
-  workflow_dispatch:
-    inputs:
-      example_input:
-        description: 'An example input'
-        required: true
-        default: 'some_value'
 
 jobs:
-  update_data:
+  collect_data:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+      - name: Checkout the repository
+        uses: actions/checkout@v2
 
-    - name: Set up Python environment
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.x'
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
 
-    - name: Install dependencies
-      run: |
-        pip install -r requirements.txt
+      - name: Install dependencies
+        run: |
+          pip install requests pandas
 
-    - name: Run data update script
-      run: |
-        python update_data.py
+      - name: Run data collection script
+        run: python collect_data.py
+
+      - name: Commit and push new data
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add data/bls_data.csv
+          git commit -m "Update BLS data"
+          git push
