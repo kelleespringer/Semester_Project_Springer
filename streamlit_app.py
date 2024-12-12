@@ -13,7 +13,7 @@ st.set_page_config(
 )
 st.title("US Bureau of Labor Statistics Dashboard")
 st.write("Let's look at Total Nonfarm Employment, Unemployment Rate, Civilian Unemployment, and Civilian Employment.")
-st.sidebar.header("User Input Features")
+st.sidebar.header("Select a Year")
 selected_year = st.sidebar.selectbox("Select a Year", ("2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024"))
 headers = {'Content-type': 'application/json'}
 data = json.dumps({
