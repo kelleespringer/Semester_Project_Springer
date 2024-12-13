@@ -31,13 +31,24 @@ if not os.path.exists(data_directory):
 def process_bls_data(json_data):
     data_list = []
 
-
     for series in json_data.get('Results', {}).get('series', []):
         series_id = series.get('seriesID')
-        for entry in series.get('data', []):
+        
+        # Check if 'data' exists
+        data_entries = series.get('data', [])
+        if not data_entries:
+            continue  # Skip if no data is found
+
+        for entry in data_entries:
+            # Check if the necessary fields exist
             year = entry.get('year')
             period = entry.get('period')
             value = entry.get('value')
+
+            # Handle missing value gracefully
+            if not year or not period or value is None:
+                continue  # Skip invalid entries
+
             data_list.append({
                 'series_id': series_id,
                 'year': year,
@@ -45,9 +56,13 @@ def process_bls_data(json_data):
                 'value': value
             })
 
+    # Convert to DataFrame
     df = pd.DataFrame(data_list)
+
+    # Save to CSV
     df.to_csv(os.path.join(data_directory, 'bls_data.csv'), index=False)
     return df
+
 
 
 if json_data:
