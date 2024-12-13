@@ -58,8 +58,8 @@ def process_bls_data(json_data):
 
     # Convert to DataFrame
     df = pd.DataFrame(data_list)
+    st.write("Processed DataFrame:", df.head())  # Check DataFrame structure
 
-    # Save to CSV
     df.to_csv(os.path.join(data_directory, 'bls_data.csv'), index=False)
     return df
 
