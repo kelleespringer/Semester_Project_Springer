@@ -15,27 +15,28 @@ st.title("US Bureau of Labor Statistics Dashboard")
 st.write("Let's look at Total Nonfarm Employment, Unemployment Rate, Civilian Unemployment, and Civilian Employment.")
 st.sidebar.header("Select a Year")
 selected_year = st.sidebar.selectbox("Select a Year", ("2019", "2020", "2021", "2022", "2023", "2024"))
+
 headers = {'Content-type': 'application/json'}
-data = json.dumps({
-    "seriesid": ['CES0000000001', 'LNS14000000', 'LNS13000000', 'LNS12000000'],
-    "startyear": selected_year,
-    "endyear": selected_year
-})
 
-p = requests.post('https://api.bls.gov/publicAPI/v1/timeseries/data/', data=data, headers=headers)
+@st.cache_data
+def fetch_bls_data(year):
+    data = json.dumps({
+        "seriesid": ['CES0000000001', 'LNS14000000', 'LNS13000000', 'LNS12000000'],
+        "startyear": year,
+        "endyear": year
+    })
+    p = requests.post('https://api.bls.gov/publicAPI/v1/timeseries/data/', data=data, headers=headers)
+    return p.json()
 
-if p.status_code != 200:
-    st.error(f"Error: Unable to fetch data from BLS API. Status Code: {p.status_code}")
-else:
-    json_data = p.json()
+json_data = fetch_bls_data(selected_year)
 
+if json_data and json_data.get('status') == 'REQUEST_SUCCEEDED':
     data_directory = 'data/'
     if not os.path.exists(data_directory):
         os.makedirs(data_directory)
 
     def process_bls_data(json_data):
         data_list = []
-
         for series in json_data.get('Results', {}).get('series', []):
             series_id = series.get('seriesID', None)
             for entry in series.get('data', []):
@@ -55,6 +56,8 @@ else:
         df.to_csv(os.path.join(data_directory, 'bls_data.csv'), index=False)
         return df
 
+    df = process_bls_data(json_data)
+    
     if json_data:
         df = process_bls_data(json_data)
 
@@ -69,11 +72,5 @@ else:
 
             filtered_df = df[df['series_id'] == series_map[data_filter]]
             filtered_df['value'] = pd.to_numeric(filtered_df['value'], errors='coerce')
-
-            if filtered_df['value'].isnull().any():
-                st.warning("Some values could not be converted to numeric. They have been set to NaN.")
-                
             st.bar_chart(filtered_df.set_index('period')['value'])
             st.line_chart(filtered_df.set_index('period')['value'])
-        else:
-            st.error("No data available for the selected year.")
