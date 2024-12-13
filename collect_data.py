@@ -4,7 +4,7 @@ import json
 import os
 
 # Define the path to the stored CSV file
-CSV_FILE_PATH = 'data/bls_data.csv'
+CSV_FILE_PATH = 'bls_data.csv'
 
 # BLS API request headers and payload
 headers = {'Content-type': 'application/json'}
